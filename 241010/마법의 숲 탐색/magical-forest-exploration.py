@@ -1,10 +1,10 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 
 R, C, K = map(int, input().split())
 
 m = [[0 for j in range(C)] for i in range(R+3)]
 di2 = {}
-entries = {}
+entries = []
 row_val = {}
 
 def in_bounds(x, y):
@@ -22,15 +22,41 @@ def down(x, y, entry):
     else:
         return (x, y, entry)
 
+
+def bfs(x, y):
+    result = x
+    q = deque([(x, y)])
+    visit = set([(x, y)])
+
+    while q:
+        q_x, q_y = q.popleft()
+        directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+
+        for dx, dy in directions:
+            new_x, new_y = q_x + dx, q_y + dy
+            if in_bounds(new_x, new_y) and (new_x, new_y) not in visit and (((new_x, new_y) in di2 and
+                    di2[(new_x, new_y)] == di2[(q_x, q_y)]) or (m[new_x][new_y] == 1 and (q_x, q_y) in entries)):
+                q.append((new_x, new_y))
+                visit.add((new_x, new_y))
+                result = min(result, new_x)
+    return result
+
+
+
+
+
+
+
 answer = 0
 for k in range(K):
     c, d = map(int, input().split())
     result = down(R+1, c-1, d%4)
     # print(result)
     if result[0] >= R-1:
-        m = [[0 for j in range(C)] for i in range(R+2)]
+        m = [[0 for j in range(C)] for i in range(R+3)]
         di2 = {}
-        entries = {}
+        entries = []
+        row_val = {}
     else:
         x, y = result[0], result[1]
         m[x][y], m[x+1][y], m[x-1][y], m[x][y+1], m[x][y-1] = 1, 1, 1, 1, 1
@@ -39,52 +65,17 @@ for k in range(K):
         di2[(x-1, y)] = (x, y)
         di2[(x, y+1)] = (x, y)
         di2[(x, y-1)] = (x, y)
-        entries[(x, y)] = result[2]%4
-        #행 추가..
+        if result[2]%4 == 0:
+            entries.append((x+1, y))
+        elif result[2]%4 == 1:
+            entries.append((x, y+1))
+        elif result[2]%4 == 2:
+            entries.append((x-1, y))
+        elif result[2]%4 == 3:
+            entries.append((x, y-1))
 
-        neighbors = defaultdict(list)
-        if x == 1:
-            pass
-        else:
-            if result[2] % 4 == 0:
-                if in_bounds(x + 1, y + 1) and m[x + 1][y + 1] == 1:
-                    neighbors[(x, y)].append(di2[(x + 1, y + 1)])
-                if in_bounds(x + 2, y) and m[x + 2][y] == 1:
-                    neighbors[(x, y)].append(di2[(x + 2, y)])
-                if in_bounds(x + 1, y - 1) and m[x + 1][y - 1] == 1:
-                    neighbors[(x, y)].append(di2[(x + 1, y - 1)])
-            elif result[2] % 4 == 1:
-                if in_bounds(x + 1, y + 1) and m[x + 1][y + 1] == 1:
-                    neighbors[(x, y)].append(di2[(x + 1, y + 1)])
-                if in_bounds(x, y + 2) and m[x][y + 2] == 1:
-                    neighbors[(x, y)].append(di2[(x, y + 2)])
-                if in_bounds(x - 1, y + 1) and m[x - 1][y + 1] == 1:
-                    neighbors[(x, y)].append(di2[(x - 1, y + 1)])
-            elif result[2] % 4 == 2:
-                if in_bounds(x - 1, y + 1) and m[x - 1][y + 1] == 1:
-                    neighbors[(x, y)].append(di2[(x - 1, y + 1)])
-                if in_bounds(x - 2, y) and m[x - 2][y] == 1:
-                    neighbors[(x, y)].append(di2[(x - 2, y)])
-                if in_bounds(x - 1, y - 1) and m[x - 1][y - 1] == 1:
-                    neighbors[(x, y)].append(di2[(x - 1, y - 1)])
-            elif result[2] % 4 == 3:
-                if in_bounds(x - 1, y - 1) and m[x - 1][y - 1] == 1:
-                    neighbors[(x, y)].append(di2[(x - 1, y - 1)])
-                if in_bounds(x, y - 2) and m[x][y - 2] == 1:
-                    neighbors[(x, y)].append(di2[(x, y - 2)])
-                if in_bounds(x + 1, y - 1) and m[x + 1][y - 1] == 1:
-                    neighbors[(x, y)].append(di2[(x + 1, y - 1)])
-
-        if (x, y) not in neighbors:
-            answer += R-(x-1)
-            row_val[(x,y)] = R-(x-1)
-        else:
-            max_val = 0
-            for neighbor in neighbors[(x, y)]:
-                if row_val[neighbor] > max_val:
-                    max_val = row_val[neighbor]
-            answer += max_val
-            row_val[(x,y)] = max_val
+        result_row = bfs(x, y)
+        answer += R - (result_row)
 
 
 print(answer)
