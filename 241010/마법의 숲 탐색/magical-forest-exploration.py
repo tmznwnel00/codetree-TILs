@@ -7,23 +7,20 @@ di2 = {}
 entries = {}
 row_val = {}
 
+def in_bounds(x, y):
+    return 0 <= x < len(m) and 0 <= y < len(m[0])
 def down(x, y, entry):
     # print(x, y)
     if x == 1:
         return (x, y, entry)
-    if m[x-1][y-1] == 0 and m[x-1][y+1] == 0 and m[x-2][y] == 0:
+    if in_bounds(x-1, y-1) and in_bounds(x-1, y+1) and in_bounds(x-2, y) and m[x-1][y-1] == 0 and m[x-1][y+1] == 0 and m[x-2][y] == 0:
         return down(x-1, y, entry)
-    elif y > 1 and (m[x+1][y-1] == 0 and m[x][y-2] == 0
-          and m[x-1][y-1] == 0 and m[x-1][y-2] == 0 and m[x-2][y-1] == 0):
+    elif in_bounds(x+1, y-1) and in_bounds(x, y-2) and in_bounds(x-1, y-1) and in_bounds(x-1, y-2) and in_bounds(x-2, y-1) and m[x+1][y-1] == 0 and m[x][y-2] == 0 and m[x-1][y-1] == 0 and m[x-1][y-2] == 0 and m[x-2][y-1] == 0:
         return down(x-1, y-1, (entry-1)%4)
-    elif y < C-2 and (m[x+1][y+1] == 0 and m[x][y+2] == 0
-          and m[x-1][y+1] == 0 and m[x-1][y+2] == 0 and m[x-2][y+1] == 0):
+    elif in_bounds(x+1, y+1) and in_bounds(x, y+2) and in_bounds(x-1, y+1) and in_bounds(x-1, y+2) and in_bounds(x-2, y+1) and m[x+1][y+1] == 0 and m[x][y+2] == 0 and m[x-1][y+1] == 0 and m[x-1][y+2] == 0 and m[x-2][y+1] == 0:
         return down(x-1, y+1, (entry+1)%4)
     else:
         return (x, y, entry)
-
-def in_bounds(x, y):
-    return 0 <= x < len(m) and 0 <= y < len(m[0])
 
 answer = 0
 for k in range(K):
