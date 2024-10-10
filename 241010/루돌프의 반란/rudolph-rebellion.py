@@ -186,6 +186,7 @@ for m in range(M):
         heapq.heappush(hq, (length, -santa[0], -santa[1]))
     for santa in santas.keys():
         scores[santa] += 1
+    print(scores)
 
 
 
