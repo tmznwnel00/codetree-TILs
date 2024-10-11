@@ -14,20 +14,23 @@ start = 0
 costs[start] = 0
 
 def make_cost():
+    pq = [(0, start)]  # (cost, node)
     visited = set([start])
-    q = deque([start])
+    costs[start] = 0
 
-    while q:
-        node = q.popleft()
-        edge = edges[node]
-        for neighbor, weight in edge:
-            if neighbor == start:
+    while pq:
+        current_cost, node = heapq.heappop(pq)
+        if current_cost > costs[node]:
+            continue
+
+        for neighbor, weight in edges[node]:
+            if neighbor in visited:
                 continue
-            if costs[neighbor] > costs[node] + weight:
-                costs[neighbor] = costs[node] + weight
-            if neighbor not in visited:
-                q.append(neighbor)
-                visited.add(neighbor)
+            new_cost = current_cost + weight
+            if new_cost < costs[neighbor]:
+                costs[neighbor] = new_cost
+                heapq.heappush(pq, (new_cost, neighbor))
+
 
 for q in range(Q):
     l = list(map(int, input().split()))
@@ -61,7 +64,7 @@ for q in range(Q):
             product = heapq.heappop(products_hq)
             if product[1] not in products:
                 continue
-            elif product[0] >= 0:
+            elif product[0] > 0:
                 return_product.append(product)
             else:
                 deleted_products.add(product[1])
