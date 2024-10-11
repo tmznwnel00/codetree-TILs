@@ -5,6 +5,7 @@ Q = int(input())
 
 nodes = [0] * 2001
 edges = defaultdict(list)
+edges2 = defaultdict(int)
 products = {}
 products_hq = []
 deleted_products = set([])
@@ -12,6 +13,22 @@ costs = [101*10001] * 2001
 started = set([0])
 start = 0
 costs[start] = 0
+
+# def make_cost():
+#     visited = set([start])
+#     q = deque([start])
+#
+#     while q:
+#         node = q.popleft()
+#         edge = edges[node]
+#         for neighbor, weight in edge:
+#             if neighbor == start:
+#                 continue
+#             if costs[neighbor] > costs[node] + weight:
+#                 costs[neighbor] = costs[node] + weight
+#             if neighbor not in visited:
+#                 q.append(neighbor)
+#                 visited.add(neighbor)
 
 def make_cost():
     pq = [(0, start)]  # (cost, node)
@@ -42,9 +59,12 @@ for q in range(Q):
 
         for i in range(1, m + 1):
             v, u, w = l[i * 3], l[i * 3 + 1], l[i * 3 + 2]
-            # edges[(u, v)] = w
-            edges[u].append((v, w))
-            edges[v].append((u, w))
+            if (u, v) in edges2 and edges2[(u, v)] < w:
+                continue
+            else:
+                edges[u].append((v, w))
+                edges[v].append((u, w))
+                edges2[(u, v)] = w
         make_cost()
 
     elif t == 200:
