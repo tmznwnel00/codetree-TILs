@@ -1,38 +1,19 @@
 import heapq
-from collections import defaultdict, deque
+from collections import defaultdict
 
 Q = int(input())
 
 nodes = [0] * 2001
 edges = defaultdict(list)
-edges2 = defaultdict(int)
 products = {}
 products_hq = []
 deleted_products = set([])
-costs = [101*10001] * 2001
-started = set([0])
+costs = [101 * 10001] * 2001
 start = 0
 costs[start] = 0
 
-# def make_cost():
-#     visited = set([start])
-#     q = deque([start])
-#
-#     while q:
-#         node = q.popleft()
-#         edge = edges[node]
-#         for neighbor, weight in edge:
-#             if neighbor == start:
-#                 continue
-#             if costs[neighbor] > costs[node] + weight:
-#                 costs[neighbor] = costs[node] + weight
-#             if neighbor not in visited:
-#                 q.append(neighbor)
-#                 visited.add(neighbor)
-
 def make_cost():
     pq = [(0, start)]  # (cost, node)
-    visited = set([start])
     costs[start] = 0
 
     while pq:
@@ -41,13 +22,10 @@ def make_cost():
             continue
 
         for neighbor, weight in edges[node]:
-            if neighbor in visited:
-                continue
             new_cost = current_cost + weight
             if new_cost < costs[neighbor]:
                 costs[neighbor] = new_cost
                 heapq.heappush(pq, (new_cost, neighbor))
-
 
 for q in range(Q):
     l = list(map(int, input().split()))
@@ -59,12 +37,24 @@ for q in range(Q):
 
         for i in range(1, m + 1):
             v, u, w = l[i * 3], l[i * 3 + 1], l[i * 3 + 2]
-            if (u, v) in edges2 and edges2[(u, v)] < w:
-                continue
-            else:
+            # 중복 간선 처리
+            edge_updated = False
+            for idx, (neighbor, weight) in enumerate(edges[u]):
+                if neighbor == v and weight > w:
+                    edges[u][idx] = (v, w)
+                    edge_updated = True
+                    break
+            if not edge_updated:
                 edges[u].append((v, w))
+
+            edge_updated = False
+            for idx, (neighbor, weight) in enumerate(edges[v]):
+                if neighbor == u and weight > w:
+                    edges[v][idx] = (u, w)
+                    edge_updated = True
+                    break
+            if not edge_updated:
                 edges[v].append((u, w))
-                edges2[(u, v)] = w
         make_cost()
 
     elif t == 200:
@@ -82,22 +72,17 @@ for q in range(Q):
         return_product = []
         while products_hq:
             product = heapq.heappop(products_hq)
-            if product[1] not in products:
-                continue
-            elif product[0] > 0:
-                return_product.append(product)
+            if product[1] in products:
+                if product[0] <= 0:
+                    print(product[1])
+                    del products[product[1]]
+                    result_product = product
+                    break
             else:
-                deleted_products.add(product[1])
-                del products[product[1]]
-                result_product = product
-                break
-        if result_product:
-            print(result_product[1])
-        else:
-            print(-1)
+                continue
 
-        for product in return_product:
-            heapq.heappush(products_hq, product)
+        if result_product is None:
+            print(-1)
 
     elif t == 500:
         s = l[1]
@@ -106,10 +91,9 @@ for q in range(Q):
         costs[start] = 0
         make_cost()
 
-        products_hq = []
-
+        new_products_hq = []
         for id, (revenue, dest) in products.items():
-            if costs[dest] == 101 * 10001:
-                pass
-            elif revenue >= costs[dest]:
-                heapq.heappush(products_hq, (costs[dest] - revenue, id))
+            if costs[dest] != 101 * 10001 and revenue >= costs[dest]:
+                heapq.heappush(new_products_hq, (costs[dest] - revenue, id))
+
+        products_hq = new_products_hq
