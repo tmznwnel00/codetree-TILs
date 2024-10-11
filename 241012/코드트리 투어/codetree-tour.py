@@ -51,15 +51,15 @@ for q in range(Q):
 
     elif t == 300:
         id = l[1]
-        deleted_products.add(id)
+        if id in products:
+            del products[id]
 
     elif t == 400:
         result_product = None
         return_product = []
         while products_hq:
             product = heapq.heappop(products_hq)
-            if product[1] in deleted_products:
-                del products[product[1]]
+            if product[1] not in products:
                 continue
             elif product[0] > 0:
                 return_product.append(product)
@@ -90,6 +90,3 @@ for q in range(Q):
                 pass
             elif revenue >= costs[dest]:
                 heapq.heappush(products_hq, (costs[dest] - revenue, id))
-        # if start not in started:
-        #     # 다시 cost 산정
-        #     pass
