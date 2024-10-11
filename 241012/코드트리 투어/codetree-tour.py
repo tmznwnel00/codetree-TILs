@@ -61,7 +61,7 @@ for q in range(Q):
             product = heapq.heappop(products_hq)
             if product[1] not in products:
                 continue
-            elif product[0] > 0:
+            elif product[0] >= 0:
                 return_product.append(product)
             else:
                 deleted_products.add(product[1])
