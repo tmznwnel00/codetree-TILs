@@ -107,6 +107,10 @@ for _ in range(m):
     while len(new_sequence) < n ** 2:
         new_sequence.append(0)
 
+    while len(new_sequence) > n ** 2:
+        new_sequence.pop()
+
+
     sequence = new_sequence
 
 print(answer)
