@@ -59,9 +59,9 @@ for _ in range(m):
     current_index = 1
     cnt = 0
     while True:
-        if sequence[current_index] == 0:
+        if current_index >= len(sequence):
             break
-        elif current_index >= len(sequence):
+        if sequence[current_index] == 0:
             break
         else:
             if sequence[current_index] != current_num:
