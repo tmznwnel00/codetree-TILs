@@ -58,8 +58,10 @@ for _ in range(m):
     start_index = 0
     current_index = 1
     cnt = 0
-    while current_index < n ** 2:
+    while True:
         if sequence[current_index] == 0:
+            break
+        elif current_index >= len(sequence):
             break
         else:
             if sequence[current_index] != current_num:
@@ -85,8 +87,10 @@ for _ in range(m):
     cnt = 0
     current_num = sequence[1]
     index = 1
-    while current_index < n ** 2:
+    while True:
         if sequence[index] == 0:
+            break
+        if current_index >= len(sequence):
             break
         if sequence[index] != current_num:
             new_sequence.append(cnt)
